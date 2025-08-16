@@ -1,11 +1,12 @@
 package org.polyfrost.fullbright.hooks;
 
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.integrated.IntegratedServer;
 import org.polyfrost.fullbright.FullBright;
 
 public class FullBrightHook {
     public static boolean shouldUpdateLightLevel() {
-        MinecraftServer server = MinecraftServer.getServer();
-        return server == null || !server.isCallingFromMinecraftThread() && FullBright.config.fullBrightMode == 1;
+        IntegratedServer server = Minecraft.getMinecraft().getIntegratedServer();
+        return (server == null || !server.isCallingFromMinecraftThread()) && FullBright.config.fullBrightMode == 1;
     }
 }
