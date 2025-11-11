@@ -9,7 +9,7 @@ public class FullBrightConfig extends Config {
     public FullBrightConfig() {
         super(FullBright.ID + ".json", FullBright.NAME, Category.QOL);
 
-        loadFrom("patcher.toml")
+        loadFrom("patcher.toml");
     }
 
     @Dropdown(
