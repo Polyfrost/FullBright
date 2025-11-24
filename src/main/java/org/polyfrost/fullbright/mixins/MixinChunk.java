@@ -7,6 +7,7 @@ import org.polyfrost.fullbright.hooks.FullBrightHook;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+//#if MC<12001
 @Mixin(Chunk.class)
 public class MixinChunk {
     @ModifyReturnValue(method = {"getLightFor", "getLightSubtracted"}, at = @At("RETURN"))
@@ -14,3 +15,4 @@ public class MixinChunk {
         return FullBrightHook.shouldUpdateLightLevel() ? FullBright.config.lightLevel : original;
     }
 }
+//#endif
