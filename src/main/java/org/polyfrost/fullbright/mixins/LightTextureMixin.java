@@ -11,7 +11,7 @@ package org.polyfrost.fullbright.mixins;
 
 //$$ @Mixin(LightTexture.class)
 public class LightTextureMixin {
-//$$ @WrapOperation(method = "updateLightTexture", at = @At(value = "FIELD", target = "Ljava/lang/Double;floatValue()F"))
+//$$ @WrapOperation(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Ljava/lang/Double;floatValue()F"))
 //$$ private float modifyGamma(Double instance, Operation<Float> original) {
 //$$     return FullBright.config.fullBrightMode == 0 ? FullBright.config.gamma : original.call(instance);
 //$$ }
