@@ -12,10 +12,12 @@ public class FullBrightConfig extends Config {
         loadFrom("patcher.toml");
     }
 
+    //#if MC < 11700
     @Dropdown(
             title = "FullBright Mode",
             options = {"Gamma", "Light Level"}
     )
+    //#endif
     public int fullBrightMode = 0;
 
     @Slider(
