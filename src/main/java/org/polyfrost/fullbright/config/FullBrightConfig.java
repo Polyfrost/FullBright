@@ -2,6 +2,7 @@ package org.polyfrost.fullbright.config;
 
 import org.polyfrost.fullbright.FullBright;
 import org.polyfrost.oneconfig.api.config.v1.Config;
+import org.polyfrost.oneconfig.api.config.v1.Property;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Dropdown;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Slider;
 
@@ -10,14 +11,17 @@ public class FullBrightConfig extends Config {
         super(FullBright.ID + ".json", FullBright.NAME, Category.QOL);
 
         loadFrom("patcher.toml");
+
+        //#if MC >= 1.16
+        addDependency("fullBrightMode", "fullBrightMode", () -> Property.Display.HIDDEN);
+        addDependency("lightLevel", "lightLevel", () -> Property.Display.HIDDEN);
+        //#endif
     }
 
-    //#if MC < 11700
     @Dropdown(
             title = "FullBright Mode",
             options = {"Gamma", "Light Level"}
     )
-    //#endif
     public int fullBrightMode = 0;
 
     @Slider(
