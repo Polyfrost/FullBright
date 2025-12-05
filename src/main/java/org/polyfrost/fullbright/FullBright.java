@@ -2,15 +2,20 @@ package org.polyfrost.fullbright;
 
 //#if FABRIC
 //$$ import net.fabricmc.api.ModInitializer;
-//#elseif FORGE
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 //#endif
 
 import org.polyfrost.fullbright.config.FullBrightConfig;
 
 //#if FORGE-LIKE
-@Mod(modid = FullBright.ID, name = FullBright.NAME, version = FullBright.VERSION)
+//#if MC <= 1.12.2
+@net.minecraftforge.fml.common.Mod(modid = FullBright.ID, name = FullBright.NAME, version = FullBright.VERSION)
+//#else
+//#if NEOFORGE
+//$$ @net.neoforged.fml.common.Mod(FullBright.ID)
+//#else
+//$$ @net.minecraftforge.fml.common.Mod(FullBright.ID)
+//#endif
+//#endif
 //#endif
 public class FullBright
         //#if FABRIC
@@ -21,18 +26,28 @@ public class FullBright
     public static final String NAME = "@MOD_NAME@";
     public static final String VERSION = "@MOD_VERSION@";
 
+    public static final FullBright INSTANCE = new FullBright();
     public static FullBrightConfig config;
 
-    //#if FABRIC
-    //$$ @Override
-    //#elseif FORGE
-    @Mod.EventHandler
+    //#if FORGE-LIKE
+    //#if MC <= 1.12.2
+    @net.minecraftforge.fml.common.Mod.EventHandler
+    private void onInit(net.minecraftforge.fml.common.event.FMLPostInitializationEvent ev) {
+        init();
+    }
+    //#else
+    //$$ static {
+    //$$     INSTANCE.init();
+    //$$ }
     //#endif
-    public void onInitialize(
-            //#if FORGE
-            FMLInitializationEvent event
-            //#endif
-    ) {
+    //#else
+    //$$ @Override
+    //$$ public void onInitialize() {
+    //$$     init();
+    //$$ }
+    //#endif
+
+    public void init() {
         config = new FullBrightConfig();
     }
 }

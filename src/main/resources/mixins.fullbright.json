@@ -9,7 +9,8 @@
   "client": [
     "MixinGameSettings",
     "MixinChunk",
-    "MixinWorld"
+    "MixinWorld",
+    "LightTextureMixin"
   ],
   "verbose": true
 }

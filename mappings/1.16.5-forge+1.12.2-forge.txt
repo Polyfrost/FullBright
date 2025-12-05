@@ -1,0 +1,4 @@
+net.minecraftforge.eventbus.EventBus net.minecraftforge.fml.common.eventhandler.EventBus
+net.minecraftforge.eventbus.api.Event net.minecraftforge.fml.common.eventhandler.Event
+net.minecraftforge.eventbus.api.SubscribeEvent net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+idk net.minecraftforge.fml.common.event.FMLInitializationEvent
