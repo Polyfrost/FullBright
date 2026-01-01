@@ -1,5 +1,7 @@
 package org.polyfrost.fullbright.mixins;
 
+// legacy only
+/*
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.world.World;
 import org.polyfrost.fullbright.FullBright;
@@ -7,7 +9,6 @@ import org.polyfrost.fullbright.hooks.FullBrightHook;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-//#if MC<12001
 @Mixin(World.class)
 public class MixinWorld {
     @ModifyReturnValue(
@@ -26,4 +27,4 @@ public class MixinWorld {
         return FullBrightHook.shouldUpdateLightLevel() || original;
     }
 }
-//#endif
+*/
