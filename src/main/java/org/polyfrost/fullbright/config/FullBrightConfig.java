@@ -30,7 +30,7 @@ public class FullBrightConfig extends Config {
 
     @Slider(
             title = "Gamma",
-            min = 0, max = 15f, step = 1f
+            max = 15f, step = 1f
     )
     public int gamma = 15;
 

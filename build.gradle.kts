@@ -32,7 +32,7 @@ dependencies {
     mappings(loom.layered {
         officialMojangMappings()
         parchment("org.parchmentmc.data:parchment-${property("minecraft_version")}:${property("parchment_version")}@zip")
-//        mappings("dev.lambdaurora:yalmm:${property("minecraft_version")}+build.${property("yalmm_version")}")
+        mappings("dev.lambdaurora:yalmm:${property("minecraft_version")}+build.${property("yalmm_version")}")
     })
     modImplementation("net.fabricmc:fabric-loader:${property("loader_version")}")
     modImplementation("org.polyfrost.oneconfig:${property("minecraft_version")}-fabric:1.0.0-alpha.181")
