@@ -21,7 +21,7 @@
     "mixins.${mod_id}.json"
   ],
   "depends": {
-    "minecraft": "~${minor_mc_version}",
-    "fabricloader": ">=0.15.11"
+    "minecraft": ">=${mc_version}",
+    "fabricloader": ">=${loader_version}"
   }
 }

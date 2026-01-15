@@ -1,44 +1,96 @@
-@file:Suppress("UnstableApiUsage", "PropertyName")
-
-import dev.deftu.gradle.utils.GameSide
-
 plugins {
-    java
-    kotlin("jvm")
-    id("dev.deftu.gradle.multiversion")
-    id("dev.deftu.gradle.tools")
-    id("dev.deftu.gradle.tools.resources")
-    id("dev.deftu.gradle.tools.bloom")
-    id("dev.deftu.gradle.tools.shadow")
-    id("dev.deftu.gradle.tools.minecraft.loom")
-    id("dev.deftu.gradle.tools.minecraft.releases")
+    id("net.fabricmc.fabric-loom-remap") version "1.14-SNAPSHOT"
+    id("dev.deftu.gradle.bloom") version "0.2.0"
 }
 
-toolkitLoomHelper {
-    useOneConfig {
-        version = "1.0.0-alpha.180"
-        loaderVersion = "1.1.0-alpha.53"
+val modid = property("mod.id")
+val modname = property("mod.name")
+val modversion = property("mod.version")
+val mcversion = property("minecraft_version")
 
-        usePolyMixin = true
-        polyMixinVersion = "0.8.4+build.7"
+base {
+    archivesName.set(property("mod.id") as String)
+}
 
-        applyLoaderTweaker = true
+repositories {
+    maven("https://maven.parchmentmc.org")
+    maven("https://repo.polyfrost.org/releases")
+    maven("https://repo.polyfrost.org/snapshots")
+    maven("https://maven.gegy.dev/releases")
+}
 
-        for (module in arrayOf("commands", "config", "config-impl", "events", "internal", "ui", "utils")) {
-            +module
+loom {
+    runConfigs.all {
+        ideConfigGenerated(stonecutter.current.isActive)
+        runDir = "../../run" // This sets the run folder for all mc versions to the same folder. Remove this line if you want individual run folders.
+    }
+
+    runConfigs.remove(runConfigs["server"]) // Removes server run configs
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:${property("minecraft_version")}")
+    @Suppress("UnstableApiUsage")
+    mappings(loom.layered {
+        officialMojangMappings()
+        optionalProp("${property("parchment_version")}") {
+            parchment("org.parchmentmc.data:parchment-${property("minecraft_version")}:$it@zip")
         }
-    }
+        optionalProp("${property("yalmm_version")}") {
+            mappings("dev.lambdaurora:yalmm-mojbackward:${property("minecraft_version")}+build.$it")
+        }
+    })
+    modImplementation("net.fabricmc:fabric-loader:${property("loader_version")}")
+    modImplementation("org.polyfrost.oneconfig:${property("minecraft_version")}-fabric:1.0.0-alpha.181")
+    modImplementation("org.polyfrost.oneconfig:commands:1.0.0-alpha.181")
+    modImplementation("org.polyfrost.oneconfig:config:1.0.0-alpha.181")
+    modImplementation("org.polyfrost.oneconfig:config-impl:1.0.0-alpha.181")
+    modImplementation("org.polyfrost.oneconfig:events:1.0.0-alpha.181")
+    modImplementation("org.polyfrost.oneconfig:internal:1.0.0-alpha.181")
+    modImplementation("org.polyfrost.oneconfig:ui:1.0.0-alpha.181")
+    modImplementation("org.polyfrost.oneconfig:utils:1.0.0-alpha.181")
+    modImplementation("org.polyfrost.oneconfig:hud:1.0.0-alpha.181")
+}
 
-    useDevAuth("1.2.+")
-    useMixinExtras("0.5.+")
+bloom {
+    replacement("@MOD_ID@", modid!!)
+    replacement("@MOD_NAME@", modname!!)
+    replacement("@MOD_VERSION@", modversion!!)
+}
 
-    disableRunConfigs(GameSide.SERVER)
+tasks.processResources {
+    val props = mapOf(
+        "mod_id" to modid,
+        "mod_name" to modname,
+        "mod_version" to modversion,
+        "mc_version" to mcversion,
+        "loader_version" to providers.gradleProperty("loader_version").get()
+    )
 
-    if (!mcData.isNeoForge) {
-        useMixinRefMap(modData.id)
-    }
+    inputs.properties(props)
 
-    if (mcData.isForge) {
-        useForgeMixin(modData.id)
+    filesMatching("fabric.mod.json") {
+        expand(props)
     }
 }
+
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(21)
+}
+
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+tasks.jar {
+    inputs.property("archivesName", base.archivesName)
+
+    from("LICENSE") {
+        rename { "${it}_${inputs.properties["archivesName"]}" }
+    }
+}
+
+fun <T> optionalProp(property: String, block: (String) -> T?): T? =
+    findProperty(property)?.toString()?.takeUnless { it.isBlank() }?.let(block)

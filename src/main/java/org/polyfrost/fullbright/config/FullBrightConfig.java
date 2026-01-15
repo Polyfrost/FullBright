@@ -5,6 +5,7 @@ import org.polyfrost.oneconfig.api.config.v1.Config;
 import org.polyfrost.oneconfig.api.config.v1.Property;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Dropdown;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Slider;
+import org.polyfrost.oneconfig.api.config.v1.annotations.Switch;
 
 public class FullBrightConfig extends Config {
     public FullBrightConfig() {
@@ -12,11 +13,14 @@ public class FullBrightConfig extends Config {
 
         loadFrom("patcher.toml");
 
-        //#if MC >= 1.16
         addDependency("fullBrightMode", "fullBrightMode", () -> Property.Display.HIDDEN);
         addDependency("lightLevel", "lightLevel", () -> Property.Display.HIDDEN);
-        //#endif
     }
+
+    @Switch(
+            title = "Enable FullBright"
+    )
+    public boolean enable = true;
 
     @Dropdown(
             title = "FullBright Mode",
@@ -26,9 +30,9 @@ public class FullBrightConfig extends Config {
 
     @Slider(
             title = "Gamma",
-            min = 100f, max = 500f, step = 1f
+            max = 15f, step = 1f
     )
-    public int gamma = 500;
+    public int gamma = 15;
 
     @Slider(
             title = "Light Level",

@@ -1,6 +1,7 @@
-//#if MC<12001
 package org.polyfrost.fullbright.mixins;
 
+// legacy only
+/*
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.settings.GameSettings;
 import org.polyfrost.fullbright.FullBright;
@@ -18,4 +19,4 @@ public class MixinGameSettings {
         return FullBright.config.fullBrightMode == 0 ? FullBright.config.gamma : (float) instance.gammaSetting;
     }
 }
-//#endif
+*/
