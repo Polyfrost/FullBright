@@ -50,8 +50,6 @@ dependencies {
     modImplementation("org.polyfrost.oneconfig:ui:1.0.0-alpha.181")
     modImplementation("org.polyfrost.oneconfig:utils:1.0.0-alpha.181")
     modImplementation("org.polyfrost.oneconfig:hud:1.0.0-alpha.181")
-
-    implementation("dev.deftu:Bloom:0.1.2")
 }
 
 bloom {
