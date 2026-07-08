@@ -1,22 +1,39 @@
 plugins {
-    id("net.fabricmc.fabric-loom-remap") version "1.14-SNAPSHOT"
+    id("dev.kikugie.loom-back-compat")
     id("dev.deftu.gradle.bloom") version "0.2.0"
 }
 
-val modid = property("mod.id")
-val modname = property("mod.name")
-val modversion = property("mod.version")
-val mcversion = property("minecraft_version")
+val modid = property("mod.id") as String
+val modname = property("mod.name") as String
+val modversion = property("mod.version") as String
+val mcversion = property("minecraft_version") as String
+val versionrange = property("minecraft_version_range")
+val loaderversion = property("loader_version")
 
 base {
-    archivesName.set(property("mod.id") as String)
+    archivesName.set("$modid-$modversion+$mcversion")
 }
 
 repositories {
+    mavenCentral()
+    gradlePluginPortal()
+    google()
+
     maven("https://maven.parchmentmc.org")
     maven("https://repo.polyfrost.org/releases")
     maven("https://repo.polyfrost.org/snapshots")
     maven("https://maven.gegy.dev/releases")
+    maven("https://maven.deftu.dev/releases")
+
+    maven("https://maven.fabricmc.net/releases")
+    maven("https://maven.terraformersmc.com/releases")
+    maven("https://central.sonatype.com/repository/maven-snapshots/") {
+        mavenContent { snapshotsOnly() }
+    }
+    maven("https://jitpack.io") {
+        content { includeGroupAndSubgroups("com.github") }
+    }
+    maven("https://redirector.kotlinlang.org/maven/compose-dev")
 }
 
 loom {
@@ -30,32 +47,36 @@ loom {
 
 dependencies {
     minecraft("com.mojang:minecraft:${property("minecraft_version")}")
-    @Suppress("UnstableApiUsage")
-    mappings(loom.layered {
-        officialMojangMappings()
-        optionalProp("${property("parchment_version")}") {
-            parchment("org.parchmentmc.data:parchment-${property("minecraft_version")}:$it@zip")
-        }
-        optionalProp("${property("yalmm_version")}") {
-            mappings("dev.lambdaurora:yalmm-mojbackward:${property("minecraft_version")}+build.$it")
-        }
-    })
+
+    val hasOfficialMappings = findProperty("has_official_mappings")?.toString()?.toBoolean() ?: true
+    if (hasOfficialMappings) {
+        @Suppress("UnstableApiUsage")
+        mappings(loom.layered {
+            officialMojangMappings()
+            optionalProp("${property("parchment_version")}") {
+                parchment("org.parchmentmc.data:parchment-${property("minecraft_version")}:$it@zip")
+            }
+            optionalProp("${property("yalmm_version")}") {
+                mappings("dev.lambdaurora:yalmm-mojbackward:${property("minecraft_version")}+build.$it")
+            }
+        })
+    }
     modImplementation("net.fabricmc:fabric-loader:${property("loader_version")}")
-    modImplementation("org.polyfrost.oneconfig:${property("minecraft_version")}-fabric:1.0.0-alpha.181")
-    modImplementation("org.polyfrost.oneconfig:commands:1.0.0-alpha.181")
-    modImplementation("org.polyfrost.oneconfig:config:1.0.0-alpha.181")
-    modImplementation("org.polyfrost.oneconfig:config-impl:1.0.0-alpha.181")
-    modImplementation("org.polyfrost.oneconfig:events:1.0.0-alpha.181")
-    modImplementation("org.polyfrost.oneconfig:internal:1.0.0-alpha.181")
-    modImplementation("org.polyfrost.oneconfig:ui:1.0.0-alpha.181")
-    modImplementation("org.polyfrost.oneconfig:utils:1.0.0-alpha.181")
-    modImplementation("org.polyfrost.oneconfig:hud:1.0.0-alpha.181")
+    modImplementation("org.polyfrost.oneconfig:${property("minecraft_version")}-fabric:1.0.0-beta.6")
+    modImplementation("org.polyfrost.oneconfig:commands:1.0.0-beta.6")
+    modImplementation("org.polyfrost.oneconfig:config:1.0.0-beta.6")
+    modImplementation("org.polyfrost.oneconfig:config-impl:1.0.0-beta.6")
+    modImplementation("org.polyfrost.oneconfig:events:1.0.0-beta.6")
+    modImplementation("org.polyfrost.oneconfig:internal:1.0.0-beta.6")
+    modImplementation("org.polyfrost.oneconfig:ui:1.0.0-beta.6")
+    modImplementation("org.polyfrost.oneconfig:utils:1.0.0-beta.6")
+    modImplementation("org.polyfrost.oneconfig:hud:1.0.0-beta.6")
 }
 
 bloom {
-    replacement("@MOD_ID@", modid!!)
-    replacement("@MOD_NAME@", modname!!)
-    replacement("@MOD_VERSION@", modversion!!)
+    replacement("@MOD_ID@", modid)
+    replacement("@MOD_NAME@", modname)
+    replacement("@MOD_VERSION@", modversion)
 }
 
 tasks.processResources {
@@ -63,8 +84,8 @@ tasks.processResources {
         "mod_id" to modid,
         "mod_name" to modname,
         "mod_version" to modversion,
-        "mc_version" to mcversion,
-        "loader_version" to providers.gradleProperty("loader_version").get()
+        "minecraft_version_range" to versionrange,
+        "loader_version" to loaderversion
     )
 
     inputs.properties(props)
@@ -74,14 +95,17 @@ tasks.processResources {
     }
 }
 
+val javaVersionInt = (findProperty("java_version")?.toString() ?: "21").toInt()
+
 tasks.withType<JavaCompile>().configureEach {
-    options.release.set(21)
+    options.release.set(javaVersionInt)
 }
 
 java {
     withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(javaVersionInt))
+    }
 }
 
 tasks.jar {
